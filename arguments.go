@@ -33,7 +33,12 @@ func parseArgs(args []string) {
 	arch := parser.Flag("", "arch", &argparse.Options{
 		Required: false,
 		Default:  true,
-		Help:     "-Archivist prefeered arguments"})
+		Help:     "-Archivist preferred arguments"})
+
+	frenchy := parser.Flag("", "frenchy", &argparse.Options{
+		Required: false,
+		Default:  false,
+		Help:     "The French Guy preferred arguments"})
 
 	best := parser.Flag("", "best", &argparse.Options{
 		Required: false,
@@ -61,5 +66,6 @@ func parseArgs(args []string) {
 	arguments.Type = *channelType
 	arguments.Arch = *arch
 	arguments.Best = *best
+	arguments.Frenchy = *frenchy
 	arguments.Verbose = *verbose
 }
