@@ -88,9 +88,8 @@ func downloadVideo(ID string, nbIDs int, worker *sync.WaitGroup) {
 				color.Red("Failed downloading video: %s\n"), err)
 		}
 	} else if arguments.Frenchy == true {
-		cmd := exec.Command("youtube-dl",
+		cmd := exec.Command("youtube-dl --output \"%(uploader)s/%(upload_date)s - %(title)s - %(id)s/%(title)s.%(ext)s\"",
 			"-f (\"bestvideo[width>=1920]\"/bestvideo)+bestaudio/best",
-			"--output \"%(uploader)s/%(upload_date)s - %(title)s - %(id)s/%(title)s.%(ext)s\"",
 			"--ignore-errors",
 			"--no-continue",
 			"--no-overwrites",
