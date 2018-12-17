@@ -19,6 +19,7 @@ var arguments = struct {
 	Type        string
 	Arch        bool
 	Best        bool
+	Frenchy     bool
 	Verbose     bool
 }{}
 
@@ -74,6 +75,37 @@ func downloadVideo(ID string, worker *sync.WaitGroup) {
 			"--write-info-json",
 			url)
 		cmd.Dir = outputDirectory
+		out, err := cmd.CombinedOutput()
+		if arguments.Verbose == true {
+			fmt.Println(string(out))
+		}
+		if err != nil {
+			log.Fatalf(crossPre+
+				color.Yellow("[")+
+				color.Red(ID)+
+				color.Yellow("] ")+
+				color.Red("Failed downloading video: %s\n"), err)
+		}
+	} else if arguments.Frenchy == true {
+		cmd := exec.Command("youtube-dl",
+			"-f (\"bestvideo[width>=1920]\"/bestvideo)+bestaudio/best",
+			"--output \"%(uploader)s/%(upload_date)s - %(title)s - %(id)s/%(title)s.%(ext)s\"",
+			"--ignore-errors",
+			"--no-continue",
+			"--no-overwrites",
+			"--no-post-overwrites",
+			"--prefer-ffmpeg",
+			"--merge-output-format=mkv",
+			"--write-sub",
+			"--all-subs",
+			"--convert-subs=srt",
+			"--add-metadata",
+			"--write-description",
+			"--write-annotations",
+			"--write-all-thumbnails",
+			"--write-info-json",
+			"--download-archive=archive.txt",
+			url)
 		out, err := cmd.CombinedOutput()
 		if arguments.Verbose == true {
 			fmt.Println(string(out))
