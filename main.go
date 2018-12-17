@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"sync"
 	"time"
 
@@ -46,7 +47,7 @@ func extractIDS() []string {
 	return ids
 }
 
-func downloadVideo(ID string, worker *sync.WaitGroup) {
+func downloadVideo(ID string, nbIDs int, worker *sync.WaitGroup) {
 	defer worker.Done()
 
 	start := time.Now()
@@ -145,12 +146,23 @@ func downloadVideo(ID string, worker *sync.WaitGroup) {
 				color.Red("Failed downloading video: %s\n"), err)
 		}
 	}
+
+	// Pad ID
+	for len(ID) < len(strconv.Itoa(nbIDs)) {
+		ID = "0" + ID
+	}
+
 	fmt.Println(checkPre +
 		color.Yellow("[") +
 		color.Green(ID) +
 		color.Yellow("]") +
 		color.Yellow("[") +
 		color.Green(time.Since(start)) +
+		color.Yellow("]") +
+		color.Yellow("[") +
+		color.Green(ID) +
+		color.Green("/") +
+		color.Green(nbIDs) +
 		color.Yellow("]") +
 		color.Green(" Downloaded!"))
 }
@@ -169,7 +181,7 @@ func main() {
 	for _, id := range ids {
 		worker.Add(1)
 		count++
-		go downloadVideo(id, &worker)
+		go downloadVideo(id, len(ids), &worker)
 		if count == arguments.Concurrency {
 			worker.Wait()
 			count = 0
