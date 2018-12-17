@@ -47,7 +47,7 @@ func extractIDS() []string {
 	return ids
 }
 
-func downloadVideo(ID string, nbIDs int, worker *sync.WaitGroup) {
+func downloadVideo(ID string, nbIDs, i int, worker *sync.WaitGroup) {
 	defer worker.Done()
 
 	start := time.Now()
@@ -88,8 +88,9 @@ func downloadVideo(ID string, nbIDs int, worker *sync.WaitGroup) {
 				color.Red("Failed downloading video: %s\n"), err)
 		}
 	} else if arguments.Frenchy == true {
-		cmd := exec.Command("youtube-dl --output \"%(uploader)s/%(upload_date)s - %(title)s - %(id)s/%(title)s.%(ext)s\"",
+		cmd := exec.Command("youtube-dl",
 			"-f (\"bestvideo[width>=1920]\"/bestvideo)+bestaudio/best",
+			"--output \"%(uploader)s/%(upload_date)s - %(title)s - %(id)s/%(title)s.%(ext)s\"",
 			"--ignore-errors",
 			"--no-continue",
 			"--no-overwrites",
@@ -147,8 +148,9 @@ func downloadVideo(ID string, nbIDs int, worker *sync.WaitGroup) {
 	}
 
 	// Pad ID
-	for len(ID) < len(strconv.Itoa(nbIDs)) {
-		ID = "0" + ID
+	index := strconv.Itoa(i)
+	for len(index) < len(strconv.Itoa(nbIDs)) {
+		index = "0" + index
 	}
 
 	fmt.Println(checkPre +
@@ -159,7 +161,7 @@ func downloadVideo(ID string, nbIDs int, worker *sync.WaitGroup) {
 		color.Green(time.Since(start)) +
 		color.Yellow("]") +
 		color.Yellow("[") +
-		color.Green(ID) +
+		color.Green(index) +
 		color.Green("/") +
 		color.Green(nbIDs) +
 		color.Yellow("]") +
@@ -177,14 +179,16 @@ func main() {
 	ids := extractIDS()
 
 	// Download videos
+	i := 1
 	for _, id := range ids {
 		worker.Add(1)
 		count++
-		go downloadVideo(id, len(ids), &worker)
+		go downloadVideo(id, len(ids), i, &worker)
 		if count == arguments.Concurrency {
 			worker.Wait()
 			count = 0
 		}
+		i++
 	}
 	worker.Wait()
 }
