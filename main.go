@@ -89,7 +89,7 @@ func downloadVideo(ID string, nbIDs, i int, worker *sync.WaitGroup) {
 		}
 	} else if arguments.Frenchy == true {
 		cmd := exec.Command("youtube-dl",
-			"--config-location config.txt",
+			"--config-location=config.txt",
 			"-f (\"bestvideo[width>=1920]\"/bestvideo)+bestaudio/best",
 			"--ignore-errors",
 			"--no-continue",
